@@ -235,6 +235,7 @@ export function reducer(state, action) {
     s.customers = s.customers.map((x) =>
       x.id === c.id ? { ...x, order } : x
     );
+    
   }
 
   return s;

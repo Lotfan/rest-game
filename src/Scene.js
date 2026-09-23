@@ -242,7 +242,15 @@ export default function Scene({ equipped, customers = [], stock = {}, recipes = 
 }
 
 const s = StyleSheet.create({
-  scene: { borderRadius: 24, overflow: 'hidden', borderWidth: 3, borderColor: C.white },
+  scene: {
+    borderRadius: 24,
+    overflow: 'hidden',
+    borderWidth: 3,
+    borderColor: C.white,
+    width: '100%',
+    maxWidth: 480,      // NEW — stops the box getting phone-widths-wide on desktop
+    alignSelf: 'center',// NEW — centers it instead of hugging the left edge
+  },
   ovenRow: { position: 'absolute', top: 8, left: 8, right: 8, flexDirection: 'row', gap: 6, zIndex: 5 },
   oven: {
   width: 44,
@@ -251,8 +259,8 @@ const s = StyleSheet.create({
   alignItems: 'center',
   justifyContent: 'center',
   overflow: 'hidden',
-  backgroundColor: 'transparent', // no background
-  borderWidth: 0,                 // no border
+  backgroundColor: 'transparent',
+  borderWidth: 0,
 },
 
 ovenEmpty: {
