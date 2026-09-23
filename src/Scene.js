@@ -11,6 +11,22 @@ import { SCENE_BACKGROUNDS } from './images.js';
 
 const COUNTER_H = 50;
 
+// A soft cloud of light behind an order icon, instead of a hard-edged square.
+// Three overlapping circles, each more solid than the last, fake a blurred edge.
+function Puff({ size, color }) {
+  const big = size, mid = size * 0.76, small = size * 0.56;
+  return (
+    <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
+      <View style={{ position: 'absolute', width: big, height: big, borderRadius: big / 2, backgroundColor: color, opacity: 0.22 }} />
+      <View style={{ position: 'absolute', width: mid, height: mid, borderRadius: mid / 2, backgroundColor: color, opacity: 0.45 }} />
+      <View style={{ position: 'absolute', width: small, height: small, borderRadius: small / 2, backgroundColor: color, opacity: 0.9 }} />
+    </View>
+  );
+}
+
+// The cup gets smaller as an order has more items, so 3 cups still fit at the table.
+const cupSizeFor = (orderLen) => (orderLen <= 1 ? 36 : orderLen === 2 ? 30 : 24);
+
 function Seat({ customer, cloth, stock, onServe }) {
   const pop = useRef(new Animated.Value(1)).current;
   const customerId = customer ? customer.id : null;
@@ -37,14 +53,19 @@ function Seat({ customer, cloth, stock, onServe }) {
             <View style={s.bubbleItems}>
               {customer.order.map((item, i) => {
                 const have = (stock[item.id] || 0) > 0;
+                const cup = cupSizeFor(customer.order.length);
+                const puff = cup * 1.9;
+                const tone = item.done ? C.pistachio : C.pink;
+                const ready = have || item.done;
                 return (
                   <Pressable
                     key={i}
                     disabled={item.done}
                     onPress={() => onServe(customer.id, i)}
-                    style={[s.item, have && !item.done && s.itemReady, item.done && s.itemDone]}
+                    style={[s.item, { width: puff, height: puff, opacity: ready ? 1 : 0.5 }]}
                   >
-                    {item.done ? <Text style={s.itemEmoji}>✅</Text> : <Food id={item.id} size={26} />}
+                    <Puff size={puff} color={tone} />
+                    {item.done ? <Text style={{ fontSize: cup * 0.75 }}>✅</Text> : <Food id={item.id} size={cup} />}
                   </Pressable>
                 );
               })}
@@ -137,15 +158,9 @@ const s = StyleSheet.create({
   plant: { position: 'absolute', right: 8, fontSize: 44 },
   seats: { position: 'absolute', left: 6, right: 6, flexDirection: 'row', alignItems: 'flex-end' },
   seat: { flex: 1, alignItems: 'center', justifyContent: 'flex-end', paddingHorizontal: 3 },
-  bubble: {
-    backgroundColor: C.white, borderRadius: 16, paddingHorizontal: 4, paddingTop: 4, paddingBottom: 6,
-    alignItems: 'center', borderWidth: 2, borderColor: C.line, minWidth: 48,
-  },
-  bubbleItems: { flexDirection: 'row', justifyContent: 'center', flexWrap: 'nowrap' },
-  item: { width: 30, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 10, opacity: 0.4 },
-  itemReady: { opacity: 1, backgroundColor: C.blush },
-  itemDone: { opacity: 1 },
-  itemEmoji: { fontSize: 22 },
+  bubble: { alignItems: 'center', minWidth: 48, marginBottom: 2 },
+  bubbleItems: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flexWrap: 'nowrap', gap: 2 },
+  item: { alignItems: 'center', justifyContent: 'center' },
   track: { height: 5, width: '90%', backgroundColor: C.blush, borderRadius: 3, overflow: 'hidden', marginTop: 2 },
   fill: { height: 5, borderRadius: 3 },
   customer: { marginTop: 4, marginBottom: -6 },

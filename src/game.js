@@ -165,29 +165,34 @@ export function reducer(state, action) {
     }
 
     case 'SERVE': {
-      const c = state.customers.find((x) => x.id === action.customerId);
-      if (!c) return state;
-      const item = c.order[action.itemIndex];
-      if (!item || item.done) return state;
-      if ((state.stock[item.id] || 0) < 1) return toast(state, `No ${recipeById(item.id).name} on the counter`);
+  const c = state.customers.find((x) => x.id === action.customerId);
+  if (!c) return state;
+  const item = c.order[action.itemIndex];
+  if (!item || item.done) return state;
+  const itemRecipe = recipeById(item.id);
+  if (!itemRecipe) {
+    // Order references a recipe that no longer exists — drop this customer instead of crashing.
+    return { ...state, customers: state.customers.filter((x) => x.id !== c.id) };
+  }
+  if ((state.stock[item.id] || 0) < 1) return toast(state, `No ${itemRecipe.name} on the counter`);
 
-      const stock = { ...state.stock, [item.id]: state.stock[item.id] - 1 };
-      const order = c.order.map((o, i) => (i === action.itemIndex ? { ...o, done: true } : o));
-      let s = { ...state, stock };
+  const stock = { ...state.stock, [item.id]: state.stock[item.id] - 1 };
+  const order = c.order.map((o, i) => (i === action.itemIndex ? { ...o, done: true } : o));
+  let s = { ...state, stock };
 
-      if (order.every((o) => o.done)) {
-        const total = order.reduce((sum, o) => sum + recipeById(o.id).price, 0);
-        const tip = Math.ceil(total * 0.25 * (c.patience / c.patienceMax) * tipMultiplier(state.equipped));
-        s.customers = s.customers.filter((x) => x.id !== c.id);
-        s.coins += total + tip;
-        s.totalServed += 1;
-        s = toast(s, `+${total + tip} 🪙  (tip ${tip})`);
-        s = addXp(s, order.length * 5 + 2);
-      } else {
-        s.customers = s.customers.map((x) => (x.id === c.id ? { ...x, order } : x));
-      }
-      return s;
-    }
+  if (order.every((o) => o.done)) {
+    const total = order.reduce((sum, o) => sum + (recipeById(o.id)?.price || 0), 0);
+    const tip = Math.ceil(total * 0.25 * (c.patience / c.patienceMax) * tipMultiplier(state.equipped));
+    s.customers = s.customers.filter((x) => x.id !== c.id);
+    s.coins += total + tip;
+    s.totalServed += 1;
+    s = toast(s, `+${total + tip} 🪙  (tip ${tip})`);
+    s = addXp(s, order.length * 5 + 2);
+  } else {
+    s.customers = s.customers.map((x) => (x.id === c.id ? { ...x, order } : x));
+  }
+  return s;
+}
 
     case 'BUY_RECIPE': {
       const r = recipeById(action.id);
