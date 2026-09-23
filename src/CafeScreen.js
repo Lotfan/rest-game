@@ -15,6 +15,7 @@ export default function CafeScreen({ state, dispatch }) {
     <View style={{ flex: 1 }}>
       <View style={{ paddingHorizontal: 12 }}>
         <Scene
+          bg={state.bg}
           height={sceneH}
           equipped={state.equipped}
           customers={state.customers}

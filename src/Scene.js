@@ -1,12 +1,13 @@
 // The picture of your cafe: walls, floor, decorations, tables, customers and the counter.
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Pressable, Animated, StyleSheet } from 'react-native';
+import { View, Text, Pressable, Animated, ImageBackground, StyleSheet } from 'react-native';
 import { C } from './theme.js';
 import { SEATS } from './data.js';
 import { RECIPES } from './data.js';
 import { decorById } from './game.js';
 import Food from './Food.js';
 import Character from './Character.js';
+import { SCENE_BACKGROUNDS } from './images.js';
 
 const COUNTER_H = 50;
 
@@ -62,7 +63,8 @@ function Seat({ customer, cloth, stock, onServe }) {
   );
 }
 
-export default function Scene({ equipped, customers = [], stock = {}, recipes = [], onServe, height }) {
+export default function Scene({ equipped, customers = [], stock = {}, recipes = [], onServe, height, bg }) {
+  const background = SCENE_BACKGROUNDS.find((b) => b.id === bg);
   const wall = decorById(equipped.wall)?.color;
   const floor = decorById(equipped.floor)?.color;
   const cloth = decorById(equipped.table)?.color;
@@ -78,8 +80,14 @@ export default function Scene({ equipped, customers = [], stock = {}, recipes = 
 
   const stockChips = RECIPES.filter((r) => recipes.includes(r.id) && (stock[r.id] || 0) > 0);
 
+  // A background image covers the whole scene, so the wall/floor colours step aside for it.
+  const Wrap = background ? ImageBackground : View;
+  const wrapProps = background
+    ? { source: background.source, resizeMode: 'cover' }
+    : { style: { backgroundColor: wall } };
+
   return (
-    <View style={[s.scene, { height, backgroundColor: wall }]}>
+    <Wrap {...wrapProps} style={[s.scene, { height }, wrapProps.style]}>
       {lights?.emoji ? (
         <View style={s.lights}>
           {Array.from({ length: lights.repeat || 1 }).map((_, i) => (
@@ -90,7 +98,7 @@ export default function Scene({ equipped, customers = [], stock = {}, recipes = 
       {win?.emoji ? <Text style={[s.win, { top: 36 }]}>{win.emoji}</Text> : null}
       {art?.emoji ? <Text style={[s.art, { top: 44 }]}>{art.emoji}</Text> : null}
 
-      <View style={[s.floor, { height: floorH, backgroundColor: floor }]} />
+      {!background && <View style={[s.floor, { height: floorH, backgroundColor: floor }]} />}
       {plant?.emoji ? <Text style={[s.plant, { bottom: floorH - 8 }]}>{plant.emoji}</Text> : null}
 
       <View style={[s.seats, { bottom: COUNTER_H + 6 }]}>
@@ -115,7 +123,7 @@ export default function Scene({ equipped, customers = [], stock = {}, recipes = 
           ))}
         </View>
       </View>
-    </View>
+    </Wrap>
   );
 }
 

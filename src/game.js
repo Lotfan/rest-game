@@ -35,6 +35,7 @@ export function initialState() {
     stock: {},
     owned: DECOR.filter((d) => d.cost === 0).map((d) => d.id),
     equipped: { ...START_EQUIPPED },
+    bg: null,
     customers: [],
     spawnIn: 1500,
     lastTick: Date.now(),
@@ -46,7 +47,7 @@ export function initialState() {
 
 // The parts of the state that get saved to the phone.
 export const SAVE_KEYS = [
-  'coins', 'xp', 'level', 'totalServed', 'recipes', 'ovens', 'stock', 'owned', 'equipped', 'seenHelp',
+  'coins', 'xp', 'level', 'totalServed', 'recipes', 'ovens', 'stock', 'owned', 'equipped', 'bg', 'seenHelp',
 ];
 
 const toast = (state, text, now = Date.now()) => ({ ...state, toast: { id: state.nextId, text, until: now + 2200 }, nextId: state.nextId + 1 });
@@ -218,6 +219,9 @@ export function reducer(state, action) {
       if (!d || !state.owned.includes(d.id)) return state;
       return { ...state, equipped: { ...state.equipped, [d.slot]: d.id } };
     }
+
+    case 'SET_BG':
+      return { ...state, bg: action.id };
 
     case 'DISMISS_HELP':
       return { ...state, seenHelp: true };

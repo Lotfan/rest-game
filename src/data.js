@@ -8,27 +8,17 @@ export const STOCK_MAX = 8;    // max of each item on the counter
 
 // bakeSec = seconds to bake, price = coins per item when served
 export const RECIPES = [
-  { id: 'coffee',        name: 'Coffee',         emoji: '☕', price: 5,  bakeSec: 5,  level: 1,  cost: 0 },
-  { id: 'croissant',     name: 'Croissant',      emoji: '🥐', price: 8,  bakeSec: 9,  level: 1,  cost: 0 },
-  { id: 'cookie',        name: 'Cookie',         emoji: '🍪', price: 7,  bakeSec: 8,  level: 2,  cost: 30 },
-  { id: 'tea',           name: 'Green Tea',      emoji: '🍵', price: 6,  bakeSec: 6,  level: 2,  cost: 40 },
-  { id: 'onigiri',       name: 'Onigiri',        emoji: '🍙', price: 10, bakeSec: 10, level: 3,  cost: 60 },
-  { id: 'cupcake',       name: 'Cupcake',        emoji: '🧁', price: 12, bakeSec: 12, level: 3,  cost: 80 },
-  { id: 'donut',         name: 'Donut',          emoji: '🍩', price: 14, bakeSec: 14, level: 4,  cost: 110 },
-  { id: 'agedashitofu',  name: 'Agedashi Tofu',  emoji: '🍢', price: 16, bakeSec: 15, level: 4,  cost: 130 },
-  { id: 'noodles',       name: 'Noodles',        emoji: '🍝', price: 20, bakeSec: 18, level: 5,  cost: 160 },
-  { id: 'cookieskillet', name: 'Cookie Skillet', emoji: '🍪', price: 24, bakeSec: 20, level: 5,  cost: 190 },
-  { id: 'pie',           name: 'Apple Pie',      emoji: '🥧', price: 22, bakeSec: 22, level: 6,  cost: 230 },
-  { id: 'cake',          name: 'Cake Slice',     emoji: '🍰', price: 28, bakeSec: 26, level: 6,  cost: 280 },
-  { id: 'ramen',         name: 'Ramen',          emoji: '🍜', price: 32, bakeSec: 26, level: 7,  cost: 340 },
-  { id: 'bentobox',      name: 'Bento Box',      emoji: '🍱', price: 38, bakeSec: 28, level: 8,  cost: 420 },
-  { id: 'pancakes',      name: 'Pancakes',       emoji: '🥞', price: 34, bakeSec: 30, level: 8,  cost: 480 },
-  { id: 'boba',          name: 'Bubble Tea',     emoji: '🧋', price: 40, bakeSec: 24, level: 9,  cost: 560 },
-  { id: 'mooncake',      name: 'Mooncake',       emoji: '🥮', price: 46, bakeSec: 30, level: 9,  cost: 650 },
-  { id: 'bday',          name: 'Party Cake',     emoji: '🎂', price: 60, bakeSec: 40, level: 10, cost: 850 },
+  { id: 'black',    name: 'Black Coffee',    emoji: '☕', price: 5,  bakeSec: 5,  level: 1, cost: 0 },
+  { id: 'iced',     name: 'Iced Coffee',     emoji: '🧊', price: 7,  bakeSec: 6,  level: 1, cost: 0 },
+  { id: 'tea',      name: 'Green Tea',       emoji: '🍵', price: 6,  bakeSec: 6,  level: 2, cost: 40 },
+  { id: 'chamolie', name: 'Chamomile Tea',   emoji: '🌼', price: 8,  bakeSec: 8,  level: 2, cost: 55 },
+  { id: 'flower',   name: 'Flower Tea',      emoji: '🌸', price: 11, bakeSec: 10, level: 3, cost: 90 },
+  { id: 'straw',    name: 'Strawberry Drink',emoji: '🍓', price: 15, bakeSec: 12, level: 4, cost: 140 },
+  { id: 'latte',    name: 'Latte',           emoji: '🥛', price: 20, bakeSec: 15, level: 5, cost: 210 },
+  { id: 'icedmact', name: 'Iced Matcha',     emoji: '🍹', price: 26, bakeSec: 18, level: 6, cost: 310 },
 ];
 
-export const START_RECIPES = ['coffee', 'croissant'];
+export const START_RECIPES = ['black', 'iced'];
 
 // Cost to add oven number 3, 4, 5, 6 (you start with 2)
 export const OVEN_COSTS = [150, 400, 900, 1800];
