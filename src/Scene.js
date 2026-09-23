@@ -1,6 +1,6 @@
 // The picture of your cafe: walls, floor, decorations, tables, customers and the counter.
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Pressable, Animated, ImageBackground, StyleSheet } from 'react-native';
+import { View, Text, Pressable, Animated, ImageBackground, StyleSheet, Platform } from 'react-native';
 import { C } from './theme.js';
 import { SEATS } from './data.js';
 import { RECIPES } from './data.js';
@@ -11,18 +11,52 @@ import { SCENE_BACKGROUNDS } from './images.js';
 
 const COUNTER_H = 50;
 
-// A soft cloud of light behind an order icon, instead of a hard-edged square.
-// Three overlapping circles, each more solid than the last, fake a blurred edge.
+// Several overlapping, unevenly-sized lumps (offset from each other, not sharing one
+// centre) so the outline reads as one puffy irregular cloud rather than a circle.
+// Fractions are relative to the badge's overall size.
+const LUMPS = [
+  { dx: -0.30, dy: 0.07, r: 0.58 },
+  { dx: 0.29, dy: 0.05, r: 0.55 },
+  { dx: -0.11, dy: -0.27, r: 0.50 },
+  { dx: 0.17, dy: -0.23, r: 0.47 },
+  { dx: -0.05, dy: 0.25, r: 0.53 },
+  { dx: 0.02, dy: -0.02, r: 0.74 },
+];
+
+// Soft fog behind an order icon. Each lump gets its own low-opacity glow (so the haze
+// follows the irregular outline instead of forming rings around one shared centre),
+// then the same lumps are drawn solid on top to bind them into a single shape.
 function Puff({ size, color }) {
-  const big = size, mid = size * 0.76, small = size * 0.56;
   return (
-    <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
-      <View style={{ position: 'absolute', width: big, height: big, borderRadius: big / 2, backgroundColor: color, opacity: 0.22 }} />
-      <View style={{ position: 'absolute', width: mid, height: mid, borderRadius: mid / 2, backgroundColor: color, opacity: 0.45 }} />
-      <View style={{ position: 'absolute', width: small, height: small, borderRadius: small / 2, backgroundColor: color, opacity: 0.9 }} />
+    <View pointerEvents="none" style={[StyleSheet.absoluteFill, webBlur]}>
+      {LUMPS.map((l, i) => {
+        const d = size * l.r * 1.7;
+        const cx = size / 2 + l.dx * size;
+        const cy = size / 2 + l.dy * size;
+        return (
+          <View
+            key={`glow${i}`}
+            style={{ position: 'absolute', width: d, height: d, borderRadius: d / 2, left: cx - d / 2, top: cy - d / 2, backgroundColor: color, opacity: 0.13 }}
+          />
+        );
+      })}
+      {LUMPS.map((l, i) => {
+        const d = size * l.r;
+        const cx = size / 2 + l.dx * size;
+        const cy = size / 2 + l.dy * size;
+        return (
+          <View
+            key={`core${i}`}
+            style={{ position: 'absolute', width: d, height: d, borderRadius: d / 2, left: cx - d / 2, top: cy - d / 2, backgroundColor: color, opacity: 0.9 }}
+          />
+        );
+      })}
     </View>
   );
 }
+
+// Web can genuinely blur the edges; native quietly ignores this and keeps the soft-glow look above.
+const webBlur = Platform.OS === 'web' ? { filter: 'blur(2.5px)' } : null;
 
 // The cup gets smaller as an order has more items, so 3 cups still fit at the table.
 const cupSizeFor = (orderLen) => (orderLen <= 1 ? 36 : orderLen === 2 ? 30 : 24);
