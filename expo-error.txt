@@ -1,0 +1,37 @@
+env: load .env.local
+env: export VERCEL_OIDC_TOKEN
+Starting Metro Bundler
+
+warning: Bundler cache is empty, rebuilding (this may take a minute)
+Web Bundling failed 2898ms index.js (302 modules)
+
+Error: Unable to resolve module ../assets/food/ICEDMACT.png from /Users/sana/WALLPAPER/cozy-cafe 2/src/images.js: 
+
+None of these files exist:
+  * ICEDMACT.png
+  * assets/food/ICEDMACT.png
+[0m [90m  5 |[39m   flower[33m:[39m require([32m'../assets/food/FLOWER.png'[39m)[33m,[39m
+ [90m  6 |[39m   iced[33m:[39m require([32m'../assets/food/ICED.png'[39m)[33m,[39m
+[31m[1m>[22m[39m[90m  7 |[39m   icedmact[33m:[39m require([32m'../assets/food/ICEDMACT.png'[39m)[33m,[39m
+ [90m    |[39m                      [31m[1m^[22m[39m
+ [90m  8 |[39m   latte[33m:[39m require([32m'../assets/food/LATTE.png'[39m)[33m,[39m
+ [90m  9 |[39m   straw[33m:[39m require([32m'../assets/food/STRAW.png'[39m)[33m,[39m
+ [90m 10 |[39m   tea[33m:[39m require([32m'../assets/food/TEA.png'[39m)[33m,[39m[0m
+
+Import stack:
+
+ src/images.js
+ | import "../assets/food/ICEDMACT.png"
+
+ src/DecorScreen.js
+ | import "./images.js"
+
+ App.js
+ | import "./src/DecorScreen.js"
+
+ index.js
+ | import "./App"
+
+ 
+ | import "./index"
+

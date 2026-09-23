@@ -7,7 +7,7 @@ import { cozyScore } from './game.js';
 import { C, R } from './theme.js';
 
 export default function DecorScreen({ state, dispatch }) {
-  const [slot, setSlot] = useState('wall');
+  const [slot, setSlot] = useState('scene');
   const onScene = slot === 'scene';
   const slotInfo = SLOTS.find((x) => x.id === slot);
   const items = DECOR.filter((d) => d.slot === slot);

@@ -35,7 +35,7 @@ export function initialState() {
     stock: {},
     owned: DECOR.filter((d) => d.cost === 0).map((d) => d.id),
     equipped: { ...START_EQUIPPED },
-    bg: null,
+    bg:' background12.png',
     customers: [],
     spawnIn: 1500,
     lastTick: Date.now(),
@@ -235,7 +235,7 @@ export function reducer(state, action) {
     s.customers = s.customers.map((x) =>
       x.id === c.id ? { ...x, order } : x
     );
-    
+
   }
 
   return s;

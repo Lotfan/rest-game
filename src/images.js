@@ -16,14 +16,14 @@ export const CHARACTER_IMAGES = [
 
 // Every PNG in assets/backgrounds, in file order. Pick one in the Decorate tab in-game.
 export const SCENE_BACKGROUNDS = [
-  { id: "background12.png", name: "Background 12", source: require('../assets/backgrounds/background12.png') },
-  { id: "background13.png", name: "Background 13", source: require('../assets/backgrounds/background13.png') },
-  { id: "background14.png", name: "Background 14", source: require('../assets/backgrounds/background14.png') },
-  { id: "background15.png", name: "Background 15", source: require('../assets/backgrounds/background15.png') },
-  { id: "background16.png", name: "Background 16", source: require('../assets/backgrounds/background16.png') },
-  { id: "background17.png", name: "Background 17", source: require('../assets/backgrounds/background17.png') },
-  { id: "background18.png", name: "Background 18", source: require('../assets/backgrounds/background18.png') },
-  { id: "background20.png", name: "Background 20", source: require('../assets/backgrounds/background20.png') },
-  { id: "background22.png", name: "Background 22", source: require('../assets/backgrounds/background22.png') },
-  { id: "background24.png", name: "Background 24", source: require('../assets/backgrounds/background24.png') },
+  { id: "background12.png", name: "cafe", source: require('../assets/backgrounds/background12.png') },
+  { id: "background13.png", name: "side bar", source: require('../assets/backgrounds/background13.png') },
+  { id: "background14.png", name: "outside cafe", source: require('../assets/backgrounds/background14.png') },
+  { id: "background15.png", name: "nightside", source: require('../assets/backgrounds/background15.png') },
+  { id: "background16.png", name: "dreamy out", source: require('../assets/backgrounds/background16.png') },
+  { id: "background17.png", name: "enchanted river", source: require('../assets/backgrounds/background17.png') },
+  { id: "background18.png", name: "mount fuji", source: require('../assets/backgrounds/background18.png') },
+  { id: "background20.png", name: "cherry outside", source: require('../assets/backgrounds/background20.png') },
+  { id: "background22.png", name: "sunset fairylight", source: require('../assets/backgrounds/background22.png') },
+  { id: "background24.png", name: "midnight dinner", source: require('../assets/backgrounds/background24.png') },
 ];
