@@ -9,7 +9,7 @@ export function TopBar({ state }) {
   return (
     <View style={s.top}>
       <View style={s.pill}>
-        <Text style={s.pillText}>🪙 {state.coins}</Text>
+        <Text style={s.pillText}>🟡  {state.coins}</Text>
       </View>
       <View style={[s.pill, { flex: 1, marginHorizontal: 8 }]}>
         <Text style={s.pillText}>Level {state.level}</Text>

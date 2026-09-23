@@ -78,8 +78,14 @@ function makeCustomer(state) {
   const count = 1 + Math.floor(Math.random() * maxItems);
   const order = [];
   for (let i = 0; i < count; i++) {
-    const id = state.recipes[Math.floor(Math.random() * state.recipes.length)];
-    order.push({ id, done: false });
+    const availableRecipes = state.recipes.filter((id) => recipeById(id));
+
+if (availableRecipes.length === 0) return state;
+
+const id =
+  availableRecipes[Math.floor(Math.random() * availableRecipes.length)];
+
+order.push({ id, done: false });
   }
   const patienceMax = patienceFor(state.equipped, count);
   const customer = {
@@ -132,6 +138,12 @@ export function reducer(state, action) {
         let left = 0;
         const remaining = [];
         for (const c of s.customers) {
+          const served = c.order.every((o) => o.done);
+          if (served) {
+            // Already paid — just give the delivery animation ~600ms before they leave.
+            if (!c.servedAt || now - c.servedAt < 600) remaining.push(c);
+            continue;
+          }
           const p = c.patience - delta;
           if (p <= 0) left += 1; else remaining.push({ ...c, patience: p });
         }
@@ -167,30 +179,64 @@ export function reducer(state, action) {
     case 'SERVE': {
   const c = state.customers.find((x) => x.id === action.customerId);
   if (!c) return state;
+
   const item = c.order[action.itemIndex];
   if (!item || item.done) return state;
-  const itemRecipe = recipeById(item.id);
-  if (!itemRecipe) {
-    // Order references a recipe that no longer exists — drop this customer instead of crashing.
-    return { ...state, customers: state.customers.filter((x) => x.id !== c.id) };
-  }
-  if ((state.stock[item.id] || 0) < 1) return toast(state, `No ${itemRecipe.name} on the counter`);
 
-  const stock = { ...state.stock, [item.id]: state.stock[item.id] - 1 };
-  const order = c.order.map((o, i) => (i === action.itemIndex ? { ...o, done: true } : o));
+  const recipe = recipeById(item.id);
+
+  // Recipe doesn't exist anymore.
+  if (!recipe) {
+    return toast(state, "That recipe doesn't exist.");
+  }
+
+  // Nothing baked.
+  if ((state.stock[item.id] || 0) < 1) {
+    return toast(state, `No ${recipe.name} on the counter`);
+  }
+
+  const stock = {
+    ...state.stock,
+    [item.id]: state.stock[item.id] - 1,
+  };
+
+  const order = c.order.map((o, i) =>
+    i === action.itemIndex ? { ...o, done: true } : o
+  );
+
   let s = { ...state, stock };
 
+  // Customer finished their whole order.
   if (order.every((o) => o.done)) {
-    const total = order.reduce((sum, o) => sum + (recipeById(o.id)?.price || 0), 0);
-    const tip = Math.ceil(total * 0.25 * (c.patience / c.patienceMax) * tipMultiplier(state.equipped));
-    s.customers = s.customers.filter((x) => x.id !== c.id);
+    const total = order.reduce((sum, o) => {
+      const r = recipeById(o.id);
+      return sum + (r?.price ?? 0);
+    }, 0);
+
+    const tip = Math.ceil(
+      total *
+        0.25 *
+        (c.patience / c.patienceMax) *
+        tipMultiplier(state.equipped)
+    );
+
+    s.customers = s.customers.map((x) =>
+      x.id === c.id
+        ? { ...x, order, servedAt: action.now || Date.now() }
+        : x
+    );
+
     s.coins += total + tip;
     s.totalServed += 1;
-    s = toast(s, `+${total + tip} 🪙  (tip ${tip})`);
+
+    s = toast(s, `+${total + tip} 🟡 (tip ${tip})`);
     s = addXp(s, order.length * 5 + 2);
   } else {
-    s.customers = s.customers.map((x) => (x.id === c.id ? { ...x, order } : x));
+    s.customers = s.customers.map((x) =>
+      x.id === c.id ? { ...x, order } : x
+    );
   }
+
   return s;
 }
 

@@ -20,7 +20,7 @@ export default function RecipesScreen({ state, dispatch }) {
         {ovenCost === null ? (
           <Text style={s.max}>Max</Text>
         ) : (
-          <Button label={`Add oven · ${ovenCost} 🪙`} disabled={state.coins < ovenCost} onPress={() => dispatch({ type: 'BUY_OVEN' })} />
+          <Button label={`Add oven · ${ovenCost} 🟡 `} disabled={state.coins < ovenCost} onPress={() => dispatch({ type: 'BUY_OVEN' })} />
         )}
       </View>
 
@@ -33,14 +33,14 @@ export default function RecipesScreen({ state, dispatch }) {
             <Food id={r.id} size={38} />
             <View style={{ flex: 1 }}>
               <Text style={s.title}>{r.name}</Text>
-              <Text style={s.sub}>Sells for {r.price} 🪙 · bakes in {r.bakeSec}s</Text>
+              <Text style={s.sub}>Sells for {r.price} 🟡  · bakes in {r.bakeSec}s</Text>
             </View>
             {learned ? (
               <Text style={s.learned}>Learned ✓</Text>
             ) : tooLow ? (
               <Text style={s.lock}>Level {r.level}</Text>
             ) : (
-              <Button label={`Learn · ${r.cost} 🪙`} disabled={state.coins < r.cost} onPress={() => dispatch({ type: 'BUY_RECIPE', id: r.id })} />
+              <Button label={`Learn · ${r.cost} 🟡 `} disabled={state.coins < r.cost} onPress={() => dispatch({ type: 'BUY_RECIPE', id: r.id })} />
             )}
           </View>
         );

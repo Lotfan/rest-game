@@ -61,6 +61,41 @@ const webBlur = Platform.OS === 'web' ? { filter: 'blur(2.5px)' } : null;
 // The cup gets smaller as an order has more items, so 3 cups still fit at the table.
 const cupSizeFor = (orderLen) => (orderLen <= 1 ? 36 : orderLen === 2 ? 30 : 24);
 
+// A single ordered drink. When it's served, the cup visibly drifts down toward the
+// customer and fades as a checkmark fades in — instead of just instantly flipping.
+function OrderCup({ item, cup, puff, have, onPress }) {
+  const deliver = useRef(new Animated.Value(item.done ? 1 : 0)).current;
+  const wasDone = useRef(item.done);
+
+  useEffect(() => {
+    if (item.done && !wasDone.current) {
+      Animated.timing(deliver, { toValue: 1, duration: 420, useNativeDriver: true }).start();
+    }
+    wasDone.current = item.done;
+  }, [item.done, deliver]);
+
+  const tone = item.done ? C.pistachio : C.pink;
+  const ready = have || item.done;
+
+  return (
+    <Pressable disabled={item.done} onPress={onPress} style={[s.item, { width: puff, height: puff, opacity: ready ? 1 : 0.5 }]}>
+      <Puff size={puff} color={tone} />
+      <Animated.View
+        style={{
+          opacity: deliver.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
+          transform: [
+            { translateY: deliver.interpolate({ inputRange: [0, 1], outputRange: [0, 30] }) },
+            { scale: deliver.interpolate({ inputRange: [0, 1], outputRange: [1, 0.5] }) },
+          ],
+        }}
+      >
+        <Food id={item.id} size={cup} />
+      </Animated.View>
+      <Animated.Text style={{ position: 'absolute', fontSize: cup * 0.75, opacity: deliver }}>✅</Animated.Text>
+    </Pressable>
+  );
+}
+
 function Seat({ customer, cloth, stock, onServe }) {
   const pop = useRef(new Animated.Value(1)).current;
   const customerId = customer ? customer.id : null;
@@ -89,18 +124,15 @@ function Seat({ customer, cloth, stock, onServe }) {
                 const have = (stock[item.id] || 0) > 0;
                 const cup = cupSizeFor(customer.order.length);
                 const puff = cup * 1.9;
-                const tone = item.done ? C.pistachio : C.pink;
-                const ready = have || item.done;
                 return (
-                  <Pressable
+                  <OrderCup
                     key={i}
-                    disabled={item.done}
+                    item={item}
+                    cup={cup}
+                    puff={puff}
+                    have={have}
                     onPress={() => onServe(customer.id, i)}
-                    style={[s.item, { width: puff, height: puff, opacity: ready ? 1 : 0.5 }]}
-                  >
-                    <Puff size={puff} color={tone} />
-                    {item.done ? <Text style={{ fontSize: cup * 0.75 }}>✅</Text> : <Food id={item.id} size={cup} />}
-                  </Pressable>
+                  />
                 );
               })}
             </View>
@@ -118,7 +150,7 @@ function Seat({ customer, cloth, stock, onServe }) {
   );
 }
 
-export default function Scene({ equipped, customers = [], stock = {}, recipes = [], onServe, height, bg }) {
+export default function Scene({ equipped, customers = [], stock = {}, recipes = [], onServe, height, bg, ovens = [], now = Date.now() }) {
   const background = SCENE_BACKGROUNDS.find((b) => b.id === bg);
   const wall = decorById(equipped.wall)?.color;
   const floor = decorById(equipped.floor)?.color;
@@ -153,6 +185,33 @@ export default function Scene({ equipped, customers = [], stock = {}, recipes = 
       {win?.emoji ? <Text style={[s.win, { top: 36 }]}>{win.emoji}</Text> : null}
       {art?.emoji ? <Text style={[s.art, { top: 44 }]}>{art.emoji}</Text> : null}
 
+      {ovens.length > 0 && (
+        <View style={s.ovenRow}>
+          {ovens.map((o, i) => {
+            if (!o) {
+              return (
+                <View key={i} style={[s.oven, s.ovenEmpty]}>
+                  <Text style={s.ovenFire}>🔥</Text>
+                </View>
+              );
+            }
+            const r = RECIPES.find((x) => x.id === o.recipeId);
+            const total = o.doneAt - o.startedAt;
+            const pct = Math.min(1, Math.max(0, (now - o.startedAt) / total));
+            const secs = Math.max(0, Math.ceil((o.doneAt - now) / 1000));
+            return (
+              <View key={i} style={s.oven}>
+                <Food id={r.id} size={26} />
+                <Text style={s.ovenSub}>{secs}s</Text>
+                <View style={s.ovenTrack}>
+                  <View style={[s.ovenFill, { width: `${pct * 100}%` }]} />
+                </View>
+              </View>
+            );
+          })}
+        </View>
+      )}
+
       {!background && <View style={[s.floor, { height: floorH, backgroundColor: floor }]} />}
       {plant?.emoji ? <Text style={[s.plant, { bottom: floorH - 8 }]}>{plant.emoji}</Text> : null}
 
@@ -172,7 +231,7 @@ export default function Scene({ equipped, customers = [], stock = {}, recipes = 
           {stockChips.length === 0 && onServe ? <Text style={s.chipEmpty}>Counter is empty. Bake something!</Text> : null}
           {stockChips.map((r) => (
             <View key={r.id} style={s.chip}>
-              <Food id={r.id} size={18} />
+              <Food id={r.id} size={26} />
               <Text style={s.chipText}>{stock[r.id]}</Text>
             </View>
           ))}
@@ -184,6 +243,26 @@ export default function Scene({ equipped, customers = [], stock = {}, recipes = 
 
 const s = StyleSheet.create({
   scene: { borderRadius: 24, overflow: 'hidden', borderWidth: 3, borderColor: C.white },
+  ovenRow: { position: 'absolute', top: 8, left: 8, right: 8, flexDirection: 'row', gap: 6, zIndex: 5 },
+  oven: {
+  width: 44,
+  height: 44,
+  borderRadius: 14,
+  alignItems: 'center',
+  justifyContent: 'center',
+  overflow: 'hidden',
+  backgroundColor: 'transparent', // no background
+  borderWidth: 0,                 // no border
+},
+
+ovenEmpty: {
+  backgroundColor: 'transparent',
+  borderWidth: 0,
+},
+  ovenFire: { fontSize: 18, opacity: 0.4 },
+  ovenSub: { fontSize: 9, fontWeight: '800', color: C.inkSoft },
+  ovenTrack: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 4, backgroundColor: 'rgba(74,36,64,0.12)' },
+  ovenFill: { height: 4, backgroundColor: C.berry },
   lights: { position: 'absolute', top: 4, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-around' },
   lightEmoji: { fontSize: 22 },
   win: { position: 'absolute', left: 22, fontSize: 64 },
@@ -207,11 +286,11 @@ const s = StyleSheet.create({
   },
   counter: {
     position: 'absolute', left: 0, right: 0, bottom: 0, height: COUNTER_H, backgroundColor: C.cocoa,
-    borderTopWidth: 4, borderTopColor: '#6E4329', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10,
+    borderTopWidth: 1, borderTopColor: '#6E4329', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10,
   },
   counterEmoji: { fontSize: 34, marginTop: -26, marginRight: 8 },
   chips: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignItems: 'center' },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
-  chipText: { color: C.ink, fontWeight: '800', fontSize: 14 },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 2 },
+  chipText: { color: C.white, fontWeight: '800', fontSize: 15 },
   chipEmpty: { color: '#F6DCC8', fontWeight: '700', fontSize: 13 },
 });
