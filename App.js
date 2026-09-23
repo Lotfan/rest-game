@@ -81,7 +81,7 @@ export default function App() {
         </View>
         <TabBar tab={tab} onChange={setTab} />
 
-        <Modal visible={!state.seenHelp} transparent animationType="fade">
+        {/* <Modal visible={!state.seenHelp} transparent animationType="fade">
           <View style={s.backdrop}>
             <View style={s.help}>
               <Text style={s.helpTitle}>Welcome to your cafe 🥐</Text>
@@ -91,7 +91,7 @@ export default function App() {
               <Button label="Open the cafe" onPress={() => dispatch({ type: 'DISMISS_HELP' })} style={{ marginTop: 14 }} />
             </View>
           </View>
-        </Modal>
+        </Modal> */}
       </SafeAreaView>
     </SafeAreaProvider>
   );

@@ -39,7 +39,7 @@ const sceneH = Math.max(380, Math.min(520, height * 0.58));
                 onPress={() => dispatch({ type: 'BAKE', recipeId: r.id, now: Date.now() })}
                 style={[s.card, full && { opacity: 0.5 }]}
               >
-                <Food id={r.id} size={42} />
+                <Food id={r.id} size={62} />
                 <Text style={s.cardName} numberOfLines={1}>{r.name}</Text>
                 <Text style={s.cardSub}>{r.bakeSec}s · have {have}</Text>
               </Pressable>
@@ -53,10 +53,10 @@ const sceneH = Math.max(380, Math.min(520, height * 0.58));
 
 const s = StyleSheet.create({
   panel: { paddingHorizontal: 12, paddingTop: 12 },
-  label: { color: C.inkSoft, fontWeight: '800', fontSize: 13, marginBottom: 6 },
+  label: { color: C.inkSoft, fontWeight: '800', fontSize: 13, marginBottom: 1 },
   card: {
-    width: 100, backgroundColor: C.white, borderRadius: R.m, paddingVertical: 8, alignItems: 'center',
-    borderWidth: 2, borderColor: C.line,
+    width: 100, borderRadius: R.m, paddingVertical: 1, alignItems: 'center',
+     
   },
   cardName: { color: C.ink, fontWeight: '800', fontSize: 13, marginTop: 2 },
   cardSub: { color: C.inkSoft, fontWeight: '700', fontSize: 11, marginTop: 1 },

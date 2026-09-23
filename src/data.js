@@ -21,8 +21,8 @@ export const RECIPES = [
 export const START_RECIPES = ['black', 'iced'];
 
 // Cost to add oven number 3, 4, 5, 6 (you start with 2)
-export const OVEN_COSTS = [150, 400, 900, 1800];
-export const START_OVENS = 2;
+export const OVEN_COSTS = [150, 200, 400, 800];
+export const START_OVENS = 3;
 
 // Slots are the places you can decorate. kind 'color' = a colour, 'emoji' = a little picture.
 // cozy = how much the item adds to your Cozy score. A higher Cozy score means
